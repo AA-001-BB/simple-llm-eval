@@ -13,44 +13,37 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout code
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # 4.2.2
-      with:
-        fetch-depth: 0
-
-    - name: Set diff range
-      id: diff
-      shell: bash
-      run: |
-        if [ "${{ github.event_name }}" = "pull_request" ]; then
-          echo "DIFF_RANGE=origin/${{ github.base_ref }}...HEAD" >> $GITHUB_ENV
-        else
-          echo "DIFF_RANGE=HEAD^ HEAD" >> $GITHUB_ENV
-        fi
-
     - name: Detect changes in path
       id: detect
       shell: bash
+      env:
+        INPUT_PATHS: ${{ inputs.paths }}
       run: |
-        git fetch origin ${{ github.base_ref }} --depth=1 || true
+        set -euo pipefail
 
-        if git rev-parse HEAD^ >/dev/null 2>&1; then
-          DIFF_RANGE="HEAD^ HEAD"
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          git fetch origin "${{ github.base_ref }}" --depth=1
+          diff_range="origin/${{ github.base_ref }}...HEAD"
+        elif git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+          diff_range="HEAD^..HEAD"
         else
-          DIFF_RANGE=$(git hash-object -t tree /dev/null)
+          diff_range="$(git hash-object -t tree /dev/null)..HEAD"
         fi
 
-        CHANGED="false"
-        IFS=',' read -ra PATHS <<< "${{ inputs.paths }}"
-        for p in "${PATHS[@]}"; do
-          p_trimmed=$(echo "$p" | xargs)
-          if [ -z "$p_trimmed" ]; then
+        changed=false
+        IFS=',' read -ra paths <<< "$INPUT_PATHS"
+        mapfile -t changed_files < <(git diff --name-only "$diff_range")
+        for path in "${paths[@]}"; do
+          path_trimmed=$(printf '%s' "$path" | xargs)
+          if [ -z "$path_trimmed" ]; then
             continue
           fi
-          if git diff --name-only $DIFF_RANGE | grep -q "^$p_trimmed\(/\|$\)"; then
-            CHANGED="true"
-            break
-          fi
+          for changed_file in "${changed_files[@]}"; do
+            if [ "$changed_file" = "$path_trimmed" ] || [[ "$changed_file" == "$path_trimmed/"* ]]; then
+              changed=true
+              break 2
+            fi
+          done
         done
 
-        echo "changed=$CHANGED" >> $GITHUB_OUTPUT
+        echo "changed=$changed" >> "$GITHUB_OUTPUT"

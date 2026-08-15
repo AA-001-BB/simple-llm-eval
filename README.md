@@ -21,6 +21,8 @@ It supports a [variety of LLM providers](https://cyberark.github.io/simple-llm-e
 
 查看[中文 AI 产品评测离线示例](docs/getting-started/product-eval-zh.md)，可使用本地手工 JSONL 夹具运行并比较结构化输出，全程不调用模型 API。这是基于 `cyberark/simple-llm-eval`（上游提交 `09c9fdad5f03014a6c3c1237ddd95eb0081934b5`）的衍生扩展，采用 Apache-2.0；`LICENSE` 和 `NOTICES` 保持不变。
 
+> **指标边界：** 示例输出是手工编写的离线夹具。报告中的 `mean_score`、`improved` 和 `regressed` 只用于验证评测器与回归比较逻辑，不代表真实模型准确率、线上质量、用户结果或业务提升。
+
 ## Getting Started
 
 See the [📚 Quickstart Guide 📚](https://cyberark.github.io/simple-llm-eval/latest/getting-started/quickstart/)

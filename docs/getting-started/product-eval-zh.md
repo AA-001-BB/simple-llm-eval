@@ -2,6 +2,8 @@
 
 本示例演示结构化 AI 产品输出的本地确定性评测。`examples/product_eval_zh/` 中的输出是**手工编写的离线夹具**，不是任何真实模型调用、用户结果、人工标注、生产结果或模型准确率。示例分数只用于稳定地说明工具行为。
 
+> **重要边界：** 报告中的 `mean_score`、`improved` 和 `regressed` 只表示这组固定夹具在评测器规则下的结果，用于验证解析、校验和回归比较流程；不能据此推断模型准确率、线上质量、用户满意度或业务提升，也不应作为真实效果数字对外宣称。
+
 本扩展基于 [`cyberark/simple-llm-eval`](https://github.com/cyberark/simple-llm-eval)，上游提交为 `09c9fdad5f03014a6c3c1237ddd95eb0081934b5`，采用 Apache-2.0 许可证。仓库中的 `LICENSE` 与 `NOTICES` 保持不变。
 
 ## 示例数据
