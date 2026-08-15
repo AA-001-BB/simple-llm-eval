@@ -17,6 +17,10 @@ It supports a [variety of LLM providers](https://cyberark.github.io/simple-llm-e
 
 **simpleval** also includes several reports to help you analyze, compare, and summarize your evaluation results. See the [available reports](https://cyberark.github.io/simple-llm-eval/latest/getting-started/reporting/) for more details.
 
+## 中文离线产品评测示例
+
+查看[中文 AI 产品评测离线示例](docs/getting-started/product-eval-zh.md)，可使用本地手工 JSONL 夹具运行并比较结构化输出，全程不调用模型 API。这是基于 `cyberark/simple-llm-eval`（上游提交 `09c9fdad5f03014a6c3c1237ddd95eb0081934b5`）的衍生扩展，采用 Apache-2.0；`LICENSE` 和 `NOTICES` 保持不变。
+
 ## Getting Started
 
 See the [📚 Quickstart Guide 📚](https://cyberark.github.io/simple-llm-eval/latest/getting-started/quickstart/)

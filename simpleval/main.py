@@ -21,6 +21,7 @@ from simpleval.cli_args import (
     InNewTestcaseParamType,
     InTestcaseParamType,
 )
+from simpleval.commands.product_eval_command import product_eval
 from simpleval.consts import EVAL_CONFIG_FILE, EVAL_RESULTS_FILE, LLM_TASKS_RESULT_FILE, PACKAGE_NAME, ReportFormat
 from simpleval.utilities.console import print_boxed_message
 from simpleval.utilities.error_handler import handle_exceptions
@@ -238,6 +239,7 @@ main.add_command(reports)
 main.add_command(metrics_explorer)
 main.add_command(litellm_models_explorer)
 main.add_command(judge_explorer)
+main.add_command(product_eval)
 
 if __name__ == '__main__':
     main()  # pylint: disable=no-value-for-parameter
