@@ -59,7 +59,7 @@ class BaseRunner(ABC):
 
     def __verify_result_type(self, result):
         if not isinstance(result, TaskResult):
-            raise ValueError(f'PLUGIN ERROR: Results must by of type {TaskResult}')
+            raise TypeError(f'PLUGIN ERROR: Results must by of type {TaskResult}')
 
     @abstractmethod
     def process_results(self, results, errors):

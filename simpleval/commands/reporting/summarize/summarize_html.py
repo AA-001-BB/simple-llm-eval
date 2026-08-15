@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import webbrowser
-from datetime import datetime
+from datetime import UTC, datetime
 
 from simpleval.consts import LOGGER_NAME, RESULTS_FOLDER
 from simpleval.evaluation.metrics.calc import MeanScores
@@ -63,7 +63,7 @@ def _write_summary_report(eval_name: str, datasets: dict):
 
     html_content = _populate_template(template=report_template, datasets=datasets)
 
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamp = datetime.now(UTC).strftime('%Y%m%d_%H%M%S')
     folder = RESULTS_FOLDER
     file_name = f'summary_report_{eval_name}_{timestamp}.html'.replace(':', '_')
     file_path = os.path.join(folder, file_name)

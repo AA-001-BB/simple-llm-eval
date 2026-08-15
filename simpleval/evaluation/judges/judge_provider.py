@@ -1,6 +1,7 @@
 import importlib
 import inspect
 from pathlib import Path
+from typing import ClassVar
 
 from simpleval.evaluation.consts import MODELS_DIR
 from simpleval.evaluation.judges.base_judge import BaseJudge
@@ -8,7 +9,7 @@ from simpleval.evaluation.judges.consts import JUDGE_MODULE_FILE, JUDGE_PACKAGE
 
 
 class JudgeProvider:
-    INTERNAL_JUDGES = ['dummy_judge']
+    INTERNAL_JUDGES: ClassVar[list[str]] = ['dummy_judge']
 
     @staticmethod
     def list_judges(filter_internal=False) -> list[str]:

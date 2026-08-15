@@ -75,6 +75,7 @@ def compare_evaluation_runs(baseline_path: Path, candidate_path: Path, output_di
     _write_comparison(comparison, output_dir)
     return comparison
 
+
 def _compare_case(case_id: str, baseline_record, candidate_record) -> CaseComparison:
     baseline_evaluation = baseline_record.evaluation
     candidate_evaluation = candidate_record.evaluation

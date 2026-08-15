@@ -84,9 +84,7 @@ def _render_markdown(run: EvaluationRun) -> str:
     return '\n'.join(lines) + '\n'
 
 
-def _validate_inputs(
-    dataset_path: Path, outputs_path: Path
-) -> tuple[list[EvaluationCase], dict[str, CandidateOutput], set[str], set[str]]:
+def _validate_inputs(dataset_path: Path, outputs_path: Path) -> tuple[list[EvaluationCase], dict[str, CandidateOutput], set[str], set[str]]:
     cases = _read_jsonl(dataset_path, EvaluationCase)
     outputs = _read_jsonl(outputs_path, CandidateOutput)
     cases_by_id = _index_unique(cases, dataset_path)

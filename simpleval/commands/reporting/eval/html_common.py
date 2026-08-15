@@ -1,7 +1,7 @@
 import logging
 import os
 import webbrowser
-from datetime import datetime
+from datetime import UTC, datetime
 
 from simpleval.consts import LOGGER_NAME, RESULTS_FOLDER
 
@@ -9,7 +9,7 @@ from simpleval.consts import LOGGER_NAME, RESULTS_FOLDER
 def save_html_report(name: str, testcase: str, html_content: str) -> str:
     logger = logging.getLogger(LOGGER_NAME)
 
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamp = datetime.now(UTC).strftime('%Y%m%d_%H%M%S')
 
     folder = RESULTS_FOLDER
     file_name = f'results_{name}_{testcase}_report_{timestamp}.html'.replace(':', '_')

@@ -47,7 +47,7 @@ def _print_to_console(
                 f'{color}{idx}{Fore.RESET}',  # None
                 f'{color}{textwrap.fill(eval_result.name_metric, width=NARROW_COLUMN_WIDTH)}{Fore.RESET}',
                 f'{color}{textwrap.fill(eval_result.llm_run_result.prompt, width=NARROW_COLUMN_WIDTH)}{Fore.RESET}',
-                f'{color}{textwrap.fill(eval_result.llm_run_result.prediction, width=NARROW_COLUMN_WIDTH)}{Fore.RESET}'
+                f'{color}{textwrap.fill(eval_result.llm_run_result.prediction, width=NARROW_COLUMN_WIDTH)}{Fore.RESET}',
                 f'{color}{textwrap.fill(eval_result.llm_run_result.expected_prediction, width=NARROW_COLUMN_WIDTH)}{Fore.RESET}',
                 f'{color}{textwrap.fill(eval_result.result, width=WIDE_COLUMN_WIDTH)}{Fore.RESET}',
                 f'{color}{eval_result.normalized_score:.3}{Fore.RESET}',

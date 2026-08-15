@@ -3,7 +3,7 @@ import json
 import logging
 import os
 import webbrowser
-from datetime import datetime
+from datetime import UTC, datetime
 
 from simpleval.commands.reporting.compare.common import CompareArgs
 from simpleval.consts import LOGGER_NAME, RESULTS_FOLDER
@@ -23,7 +23,7 @@ def _compare_results_html2(eval_set: str, left_side: CompareArgs, right_side: Co
 
     html_content = _populate_template(eval_set=eval_set, template=compare_report_template, left_side=left_side, right_side=right_side)
 
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamp = datetime.now(UTC).strftime('%Y%m%d_%H%M%S')
     folder = RESULTS_FOLDER
     file_name = f'comparison_report_{left_side.name}_vs_{right_side.name}_{timestamp}.html'.replace(':', '_')
     file_path = os.path.join(folder, file_name)

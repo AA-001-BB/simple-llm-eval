@@ -86,4 +86,4 @@ def parse_xml_response(xml_string: str) -> JudgeParsedOutput:
         return JudgeParsedOutput(reasonings=reasonings, answer=answer)
     except Exception as e:
         logger.error(f'Error parsing XML: `{xml_string}`, Error: {e}')
-        raise e
+        raise

@@ -1,4 +1,5 @@
 import json
+from typing import ClassVar
 
 import boto3
 from colorama import Fore
@@ -24,7 +25,7 @@ class BedrockClaudeSonnetJudge(BaseJudge):
     DEFAULT_MODEL_ID = SONNET45_V1_MODEL_ID
     DEFAULT_REGION = 'us-east-1'
 
-    SUPPORTED_MODEL_IDS = {
+    SUPPORTED_MODEL_IDS: ClassVar[set[str]] = {
         SONNET45_V1_MODEL_ID,
     }
 

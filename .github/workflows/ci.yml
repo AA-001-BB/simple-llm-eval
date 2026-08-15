@@ -115,9 +115,8 @@ jobs:
     strategy:
       matrix:
         include:
-          # Test 18, 20, 22 on ubuntu
-          - os: ubuntu-latest
-            node-version: 18
+          # Test supported Node.js LTS releases on Ubuntu. npm 11 (required
+          # by reports-frontend/.npmrc) supports Node.js 20.17+ only.
           - os: ubuntu-latest
             node-version: 20
           - os: ubuntu-latest
