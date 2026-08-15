@@ -37,7 +37,7 @@ def _read_jsonl(path: Path, model_type: type[ModelType]) -> list[ModelType]:
 def _index_unique(records: list[BaseModel], path: Path) -> dict[str, BaseModel]:
     indexed: dict[str, BaseModel] = {}
     for record in records:
-        case_id = getattr(record, 'case_id')
+        case_id = record.case_id
         if case_id in indexed:
             raise ValueError(f'Duplicate case_id {case_id!r} in {path}')
         indexed[case_id] = record
