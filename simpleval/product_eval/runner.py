@@ -84,7 +84,9 @@ def _render_markdown(run: EvaluationRun) -> str:
     return '\n'.join(lines) + '\n'
 
 
-def run_evaluation(dataset_path: Path, outputs_path: Path, output_dir: Path) -> EvaluationRun:
+def _validate_inputs(
+    dataset_path: Path, outputs_path: Path
+) -> tuple[list[EvaluationCase], dict[str, CandidateOutput], set[str], set[str]]:
     cases = _read_jsonl(dataset_path, EvaluationCase)
     outputs = _read_jsonl(outputs_path, CandidateOutput)
     cases_by_id = _index_unique(cases, dataset_path)
@@ -99,16 +101,28 @@ def run_evaluation(dataset_path: Path, outputs_path: Path, output_dir: Path) -> 
     prompt_versions = {output.prompt_version for output in outputs}
     if len(models) != 1 or len(prompt_versions) != 1:
         raise ValueError('Each output file must contain exactly one model and one prompt_version')
+    return cases, outputs_by_id, models, prompt_versions
 
+
+def _build_records(cases: list[EvaluationCase], outputs_by_id: dict[str, CandidateOutput]) -> list[EvaluatedCaseRecord]:
     records = []
     for case in cases:
         output = outputs_by_id[case.case_id]
         evaluation = evaluate_case(case, output.raw_output)
         records.append(EvaluatedCaseRecord(case=case, output=output, evaluation=evaluation))
+    return records
 
+
+def _build_run(
+    records: list[EvaluatedCaseRecord],
+    models: set[str],
+    prompt_versions: set[str],
+    dataset_path: Path,
+    outputs_path: Path,
+) -> EvaluationRun:
     passed = sum(record.evaluation.status == 'passed' for record in records)
     failure_counts = Counter(code for record in records for code in record.evaluation.failure_codes)
-    run = EvaluationRun(
+    return EvaluationRun(
         model=next(iter(models)),
         prompt_version=next(iter(prompt_versions)),
         dataset_sha256=_sha256(dataset_path),
@@ -123,6 +137,8 @@ def run_evaluation(dataset_path: Path, outputs_path: Path, output_dir: Path) -> 
         records=records,
     )
 
+
+def _write_run_artifacts(run: EvaluationRun, output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / 'run.json').write_text(run.model_dump_json(indent=2), encoding='utf-8')
     (output_dir / 'report.md').write_text(_render_markdown(run), encoding='utf-8')
@@ -137,9 +153,16 @@ def run_evaluation(dataset_path: Path, outputs_path: Path, output_dir: Path) -> 
             failure_reasons=record.evaluation.failure_reasons,
             raw_output=record.output.raw_output,
         )
-        for record in records
+        for record in run.records
         if record.evaluation.status == 'failed'
     ]
     review_content = ''.join(json.dumps(item.model_dump(), ensure_ascii=False) + '\n' for item in review_items)
     (output_dir / 'review_queue.jsonl').write_text(review_content, encoding='utf-8')
+
+
+def run_evaluation(dataset_path: Path, outputs_path: Path, output_dir: Path) -> EvaluationRun:
+    cases, outputs_by_id, models, prompt_versions = _validate_inputs(dataset_path, outputs_path)
+    records = _build_records(cases, outputs_by_id)
+    run = _build_run(records, models, prompt_versions, dataset_path, outputs_path)
+    _write_run_artifacts(run, output_dir)
     return run

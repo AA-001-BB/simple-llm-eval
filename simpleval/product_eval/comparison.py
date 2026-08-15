@@ -11,9 +11,14 @@ from simpleval.product_eval.models import (
 )
 
 
-def compare_evaluation_runs(baseline_path: Path, candidate_path: Path, output_dir: Path) -> EvaluationComparison:
-    baseline = EvaluationRun.model_validate_json(baseline_path.read_text(encoding='utf-8'))
-    candidate = EvaluationRun.model_validate_json(candidate_path.read_text(encoding='utf-8'))
+def _load_runs(baseline_path: Path, candidate_path: Path) -> tuple[EvaluationRun, EvaluationRun]:
+    return (
+        EvaluationRun.model_validate_json(baseline_path.read_text(encoding='utf-8')),
+        EvaluationRun.model_validate_json(candidate_path.read_text(encoding='utf-8')),
+    )
+
+
+def _validate_compatible_runs(baseline: EvaluationRun, candidate: EvaluationRun) -> dict[str, tuple[object, object]]:
     if baseline.dataset_sha256 != candidate.dataset_sha256:
         message = (
             'Dataset hashes differ. '
@@ -35,12 +40,16 @@ def compare_evaluation_runs(baseline_path: Path, candidate_path: Path, output_di
         )
         click.echo(message, err=True)
         raise ValueError(message)
+    return {case_id: (baseline_records[case_id], candidate_records[case_id]) for case_id in baseline_records}
 
-    comparisons = [
-        _compare_case(case_id, baseline_records[case_id], candidate_records[case_id])
-        for case_id in sorted(baseline_records.keys() & candidate_records.keys())
-    ]
-    comparison = EvaluationComparison(
+
+def _build_comparison(
+    baseline: EvaluationRun,
+    candidate: EvaluationRun,
+    records: dict[str, tuple[object, object]],
+) -> EvaluationComparison:
+    comparisons = [_compare_case(case_id, *records[case_id]) for case_id in sorted(records)]
+    return EvaluationComparison(
         baseline=ComparisonRunMetadata(model=baseline.model, prompt_version=baseline.prompt_version),
         candidate=ComparisonRunMetadata(model=candidate.model, prompt_version=candidate.prompt_version),
         summary=ComparisonSummary(
@@ -51,11 +60,20 @@ def compare_evaluation_runs(baseline_path: Path, candidate_path: Path, output_di
         ),
         cases=comparisons,
     )
+
+
+def _write_comparison(comparison: EvaluationComparison, output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / 'comparison.json').write_text(comparison.model_dump_json(indent=2), encoding='utf-8')
     (output_dir / 'comparison.md').write_text(_render_markdown(comparison), encoding='utf-8')
-    return comparison
 
+
+def compare_evaluation_runs(baseline_path: Path, candidate_path: Path, output_dir: Path) -> EvaluationComparison:
+    baseline, candidate = _load_runs(baseline_path, candidate_path)
+    records = _validate_compatible_runs(baseline, candidate)
+    comparison = _build_comparison(baseline, candidate, records)
+    _write_comparison(comparison, output_dir)
+    return comparison
 
 def _compare_case(case_id: str, baseline_record, candidate_record) -> CaseComparison:
     baseline_evaluation = baseline_record.evaluation
