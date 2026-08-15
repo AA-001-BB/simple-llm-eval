@@ -34,10 +34,12 @@ def init_logger(console_loglevel: int = DEFAULT_LOGLEVEL):
     os.makedirs('logs', exist_ok=True)
 
     global LOGGER_INIT
-    if LOGGER_INIT:
+    logger = logging.getLogger(LOGGER_NAME)
+    # Keep production initialization idempotent while allowing alternate
+    # logger implementations (including test doubles) to be configured.
+    if LOGGER_INIT and isinstance(logger, logging.Logger):
         return
 
-    logger = logging.getLogger(LOGGER_NAME)
     logger.setLevel(console_loglevel)
     console_handler = logging.StreamHandler()  # Logs to the console
     console_handler.setLevel(console_loglevel)
